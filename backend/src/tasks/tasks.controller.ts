@@ -7,7 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+import { TaskPropertyDto } from './dto/task-property.dto';
+import { TaskStatusPipe } from './pipe/task-status.pipe';
 
 @Controller('tasks')
 export class TasksController {
@@ -26,11 +30,13 @@ export class TasksController {
   }
 
   @Post()
+  // バリデーションパイプの有効化
+  @UsePipes(ValidationPipe)
   createTask(
     // @Bodyはリクエストボディのパラメータ
-    @Body('title') title: string,
-    @Body('description') description: string,
+    @Body() taskPropertyDto: TaskPropertyDto,
   ): string {
+    const { title, description } = taskPropertyDto;
     return `createTask Success! Parameter [title:${title}, description:${description}]`;
   }
 
@@ -42,7 +48,7 @@ export class TasksController {
   @Patch('/:id')
   updateTask(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: string,
+    @Body('status', TaskStatusPipe) status: string,
   ): string {
     return `updateTask Success! Parameter [id:${id}, status:${status}]`;
   }
